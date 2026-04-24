@@ -1,0 +1,226 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Misty_Dany Hub | Slap Battles",
+   LoadingTitle = "Настройка высоты...",
+   LoadingSubtitle = "by Gemini AI",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "MistyDanyConfig",
+      FileName = "MainHub"
+   },
+   KeySystem = false
+})
+
+-- Переменные
+local flyEnabled = false
+local flySpeed = 50
+local platformEnabled = false
+local platform
+local antiRagdollEnabled = false
+
+-- Вкладка ВСЕХ твоих скриптов
+local ScriptsTab = Window:CreateTab("My Scripts", 4483362458)
+
+ScriptsTab:CreateButton({
+   Name = "Bob The Eternal",
+   Callback = function()
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/Dusty1234567890/Rob/main/Rob"))()
+   end,
+})
+
+ScriptsTab:CreateButton({
+   Name = "Bob The Eternal v2",
+   Callback = function()
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/Dusty1234567890/Rob/main/Rob"))()
+   end,
+})
+
+ScriptsTab:CreateButton({
+   Name = "+tyk (Tycoon Clicker)",
+   Callback = function()
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/IncognitoScripts/SlapBattles/main/TycoonClicker", true))()
+   end,
+})
+
+ScriptsTab:CreateButton({
+   Name = "Guide Boss Fight",
+   Callback = function()
+       loadstring(game:HttpGet("https://pastefy.app/Ty7G6BXs/raw"))()
+   end,
+})
+
+ScriptsTab:CreateButton({
+   Name = "Farm Killstrike",
+   Callback = function()
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/IncognitoScripts/SlapBattles/main/KillstreakFarm", true))()
+   end,
+})
+
+ScriptsTab:CreateButton({
+   Name = "Doors",
+   Callback = function()
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/notzanocoddz4/bobdoors/main/main.lua"))()
+   end,
+})
+
+ScriptsTab:CreateButton({
+   Name = "Основное SBP",
+   Callback = function()
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/xxxrrxsds-art/losehubs/refs/heads/main/sbp.lua"))()
+   end,
+})
+
+-- Вкладка настроек игрока
+local PlayerTab = Window:CreateTab("Player & Fly", 4483362458)
+
+PlayerTab:CreateSlider({
+   Name = "Скорость (WalkSpeed)",
+   Range = {16, 300},
+   Increment = 1,
+   CurrentValue = 16,
+   Callback = function(Value)
+      if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+      end
+   end,
+})
+
+PlayerTab:CreateSlider({
+   Name = "Сила прыжка (JumpPower)",
+   Range = {50, 300},
+   Increment = 1,
+   CurrentValue = 50,
+   Callback = function(Value)
+      if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+         game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
+         game.Players.LocalPlayer.Character.Humanoid.UseJumpPower = true
+      end
+   end,
+})
+
+PlayerTab:CreateToggle({
+   Name = "Anti-Ragdoll",
+   CurrentValue = false,
+   Callback = function(Value)
+      antiRagdollEnabled = Value
+      if antiRagdollEnabled then
+          task.spawn(function()
+              while antiRagdollEnabled do
+                  local char = game.Players.LocalPlayer.Character
+                  if char and char:FindFirstChild("Humanoid") then
+                      char.Humanoid.PlatformStand = false
+                  end
+                  task.wait(0.1)
+              end
+          end)
+      end
+   end,
+})
+
+-- ИДЕАЛЬНЫЙ ФЛАЙ (Без изменений)
+PlayerTab:CreateToggle({
+   Name = "Fly (Лечу куда смотрю)",
+   CurrentValue = false,
+   Callback = function(Value)
+      flyEnabled = Value
+      local player = game.Players.LocalPlayer
+      local character = player.Character or player.CharacterAdded:Wait()
+      local root = character:WaitForChild("HumanoidRootPart")
+      
+      if flyEnabled then
+          local bv = Instance.new("BodyVelocity", root)
+          bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+          bv.Velocity = Vector3.new(0,0,0)
+          bv.Name = "FlyBV"
+          
+          task.spawn(function()
+              while flyEnabled do
+                  local cam = workspace.CurrentCamera.CFrame
+                  local moveDir = Vector3.new(0,0,0)
+                  
+                  if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + cam.LookVector end
+                  if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - cam.LookVector end
+                  if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - cam.RightVector end
+                  if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + cam.RightVector end
+                  
+                  bv.Velocity = moveDir * flySpeed
+                  task.wait()
+              end
+              if bv then bv:Destroy() end
+          end)
+      end
+   end,
+})
+
+PlayerTab:CreateSlider({
+   Name = "Скорость полета",
+   Range = {10, 250},
+   Increment = 5,
+   CurrentValue = 50,
+   Callback = function(Value) flySpeed = Value end,
+})
+
+-- ПЛАТФОРМА НА -15 (Идеальная высота)
+PlayerTab:CreateToggle({
+   Name = "Анти-Войд (Платформа -15)",
+   CurrentValue = false,
+   Callback = function(Value)
+      platformEnabled = Value
+      if platformEnabled then
+          platform = Instance.new("Part", workspace)
+          platform.Size = Vector3.new(2000, 1, 2000)
+          platform.Anchored = true
+          platform.Transparency = 0.7
+          platform.Material = Enum.Material.ForceField
+          
+          task.spawn(function()
+              while platformEnabled do
+                  local char = game.Players.LocalPlayer.Character
+                  if char and char:FindFirstChild("HumanoidRootPart") then
+                      -- Позиция Y зафиксирована на -15 относительно основной земли
+                      platform.Position = Vector3.new(char.HumanoidRootPart.Position.X, -15, char.HumanoidRootPart.Position.Z)
+                  end
+                  task.wait()
+              end
+              if platform then platform:Destroy() end
+          end)
+      elseif platform then
+          platform:Destroy()
+      end
+   end,
+})
+
+-- Безопасность
+local MiscTab = Window:CreateTab("Safety", 4483362458)
+
+MiscTab:CreateButton({
+   Name = "Anti-Cheat Bypass",
+   Callback = function()
+       local mt = getrawmetatable(game)
+       local old = mt.__index
+       setreadonly(mt, false)
+       mt.__index = newcclosure(function(t, k)
+           if not checkcaller() and t:IsA("Humanoid") and (k == "WalkSpeed" or k == "JumpPower") then
+               return k == "WalkSpeed" and 16 or 50
+           end
+           return old(t, k)
+       end)
+       setreadonly(mt, true)
+       Rayfield:Notify({Title = "Bypass", Content = "Анти-чит обманут", Duration = 3})
+   end,
+})
+
+MiscTab:CreateToggle({
+   Name = "Anti-AFK",
+   CurrentValue = true,
+   Callback = function(Value)
+      if Value then
+          local vu = game:GetService("VirtualUser")
+          game.Players.LocalPlayer.Idled:Connect(function()
+              vu:CaptureController()
+              vu:ClickButton2(Vector2.new())
+          end)
+      end
+   end,
+})
