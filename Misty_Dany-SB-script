@@ -100,7 +100,7 @@ PlayerTab:CreateSlider({
 })
 
 PlayerTab:CreateToggle({
-   Name = "Anti-Ragdoll (Зависание 0.1с)",
+   Name = "Anti-Ragdoll",
    CurrentValue = false,
    Callback = function(Value)
       _G.AntiRagdoll = Value
@@ -116,7 +116,7 @@ PlayerTab:CreateToggle({
                           if state == Enum.HumanoidStateType.Ragdoll or state == Enum.HumanoidStateType.FallingDown then
                               hum.PlatformStand = false
                               root.Anchored = true
-                              task.wait(0.1) -- Зависаем на 0.1 сек
+                              task.wait(0.5) -- Зависаем на 0.5 сек
                               root.Anchored = false
                               hum:ChangeState(Enum.HumanoidStateType.GettingUp)
                           end
@@ -174,7 +174,7 @@ PlayerTab:CreateSlider({
 
 -- ПЛАТФОРМА НА -15 (Идеальная высота)
 PlayerTab:CreateToggle({
-   Name = "Анти-Войд (Платформа -5)",
+   Name = "Анти-Войд (Платформа -15)",
    CurrentValue = false,
    Callback = function(Value)
       platformEnabled = Value
@@ -189,8 +189,8 @@ PlayerTab:CreateToggle({
               while platformEnabled do
                   local char = game.Players.LocalPlayer.Character
                   if char and char:FindFirstChild("HumanoidRootPart") then
-                      -- Позиция Y зафиксирована на -5 относительно основной земли
-                      platform.Position = Vector3.new(char.HumanoidRootPart.Position.X, -5, char.HumanoidRootPart.Position.Z)
+                      -- Позиция Y зафиксирована на -15 относительно основной земли
+                      platform.Position = Vector3.new(char.HumanoidRootPart.Position.X, -15, char.HumanoidRootPart.Position.Z)
                   end
                   task.wait()
               end
