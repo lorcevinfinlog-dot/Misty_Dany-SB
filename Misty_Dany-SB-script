@@ -18,6 +18,8 @@ local flySpeed = 50
 local platformEnabled = false
 local platform
 local antiRagdollEnabled = false
+local antiAfkConnection
+local antiAfkEnabled = true
 
 -- Вкладка ВСЕХ твоих скриптов
 local ScriptsTab = Window:CreateTab("My Scripts", 4483362458)
@@ -25,7 +27,7 @@ local ScriptsTab = Window:CreateTab("My Scripts", 4483362458)
 ScriptsTab:CreateButton({
    Name = "Bob The Eternal",
    Callback = function()
-       loadstring(game:HttpGet("https://raw.githubusercontent.com/Dusty1234567890/Rob/main/Rob"))()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/Dusty1234567890/Rob/main/Rob"))()
    end,
 })
 
@@ -82,7 +84,7 @@ PlayerTab:CreateSlider({
    Callback = function(Value)
       if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
          game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
-      end
+       end
    end,
 })
 
@@ -99,7 +101,7 @@ PlayerTab:CreateSlider({
    end,
 })
 
-PlayerTab:CreateToggle({
+local AntiRagdollToggle = PlayerTab:CreateToggle({
    Name = "Анти Регдол (BETA)",
    CurrentValue = false,
    Callback = function(Value)
@@ -121,40 +123,32 @@ PlayerTab:CreateToggle({
                   local root = char:FindFirstChild("HumanoidRootPart")
                   local ragdollTrigger = char:FindFirstChild("Ragdolled")
                   
-                  -- Если игра пытается включить регдолл
                   if (ragdollTrigger and ragdollTrigger.Value == true) or (hum and (hum:GetState() == Enum.HumanoidStateType.Ragdoll or hum:GetState() == Enum.HumanoidStateType.FallingDown)) then
-                      
-                      -- 1. УБИРАЕМ РЕГДОЛЛ МГНОВЕННО
                       if ragdollTrigger then ragdollTrigger.Value = false end
                       hum.PlatformStand = false
                       hum:ChangeState(Enum.HumanoidStateType.GettingUp)
                       
-                      -- 2. ДАВЛЕНИЕ СО ВСЕХ СТОРОН (Фиксация в точке)
                       if root and not root:FindFirstChild("PressForce") then
-                          workspace.Gravity = 1000 -- Гравитация на максимум (давит вниз)
-                          
+                          workspace.Gravity = 1000
                           local bp = Instance.new("BodyPosition")
                           bp.Name = "PressForce"
-                          bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge) -- Давит со всех сторон
-                          bp.D = 100 -- Упругость (чтобы не дергало)
-                          bp.P = 10000 -- Сила удержания
-                          bp.Position = root.Position -- Запирает в текущей точке
+                          bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                          bp.D = 100
+                          bp.P = 10000
+                          bp.Position = root.Position
                           bp.Parent = root
-                          
                           root.Velocity = Vector3.new(0,0,0)
                           
-                          -- Через 0.15 сек отпускаем "тиски"
                           task.delay(0.15, function()
                               if bp then bp:Destroy() end
                               workspace.Gravity = defaultGravity
                           end)
                       end
                       
-                      -- 3. ЧИСТИМ СИЛЫ ТОЛЧКА
                       if root then
                           for _, v in pairs(root:GetChildren()) do
                               if (v:IsA("BodyVelocity") or v:IsA("LinearVelocity")) and v.Name ~= "FlyBV" then
-                                  v:Destroy()
+                                   v:Destroy()
                               end
                           end
                       end
@@ -166,12 +160,12 @@ PlayerTab:CreateToggle({
           if _G.AntiRagdollConnection then
               _G.AntiRagdollConnection:Disconnect()
           end
-      end
+       end
    end,
 })
 
 -- ИДЕАЛЬНЫЙ ФЛАЙ (Без изменений)
-PlayerTab:CreateToggle({
+local FlyToggle = PlayerTab:CreateToggle({
    Name = "Fly (Лечу куда смотрю)",
    CurrentValue = false,
    Callback = function(Value)
@@ -198,10 +192,19 @@ PlayerTab:CreateToggle({
                   
                   bv.Velocity = moveDir * flySpeed
                   task.wait()
-              end
+               end
               if bv then bv:Destroy() end
           end)
       end
+   end,
+})
+
+PlayerTab:CreateKeybind({
+   Name = "Кнопка для Fly",
+   CurrentKeybind = "J",
+   HoldToInteract = false,
+   Callback = function()
+       FlyToggle:Set(not flyEnabled)
    end,
 })
 
@@ -214,7 +217,7 @@ PlayerTab:CreateSlider({
 })
 
 -- ПЛАТФОРМА НА -15 (Идеальная высота)
-PlayerTab:CreateToggle({
+local PlatformToggle = PlayerTab:CreateToggle({
    Name = "Анти-Войд (Платформа -15)",
    CurrentValue = false,
    Callback = function(Value)
@@ -230,7 +233,6 @@ PlayerTab:CreateToggle({
               while platformEnabled do
                   local char = game.Players.LocalPlayer.Character
                   if char and char:FindFirstChild("HumanoidRootPart") then
-                      -- Позиция Y зафиксирована на -15 относительно основной земли
                       platform.Position = Vector3.new(char.HumanoidRootPart.Position.X, -15, char.HumanoidRootPart.Position.Z)
                   end
                   task.wait()
@@ -238,13 +240,13 @@ PlayerTab:CreateToggle({
               if platform then platform:Destroy() end
           end)
       elseif platform then
-          platform:Destroy()
+           platform:Destroy()
       end
    end,
 })
 
 -- Безопасность
-local MiscTab = Window:CreateTab("Safety", 4483362458)
+local MiscTab = Window:CreateTab("Safety & Settings", 4483362458)
 
 MiscTab:CreateButton({
    Name = "Анти чит (BETA)",
@@ -263,16 +265,50 @@ MiscTab:CreateButton({
    end,
 })
 
-MiscTab:CreateToggle({
+local AntiAfkToggle = MiscTab:CreateToggle({
    Name = "Анти-АФК(Anti-AFK)",
    CurrentValue = true,
    Callback = function(Value)
+      antiAfkEnabled = Value
       if Value then
           local vu = game:GetService("VirtualUser")
-          game.Players.LocalPlayer.Idled:Connect(function()
+          antiAfkConnection = game.Players.LocalPlayer.Idled:Connect(function()
               vu:CaptureController()
               vu:ClickButton2(Vector2.new())
           end)
+      else
+          if antiAfkConnection then
+              antiAfkConnection:Disconnect()
+          end
       end
+   end,
+})
+
+MiscTab:CreateKeybind({
+   Name = "Кнопка для Анти-АФК",
+   CurrentKeybind = "L",
+   HoldToInteract = false,
+   Callback = function()
+       AntiAfkToggle:Set(not antiAfkEnabled)
+   end,
+})
+
+MiscTab:CreateButton({
+   Name = "🔴 Выгрузить скрипт (Unload)",
+   Callback = function()
+       -- 1. Отключаем все функции, чтобы персонаж не сломался
+       if FlyToggle then FlyToggle:Set(false) end
+       if PlatformToggle then PlatformToggle:Set(false) end
+       if AntiRagdollToggle then AntiRagdollToggle:Set(false) end
+       if AntiAfkToggle then AntiAfkToggle:Set(false) end
+       
+       -- 2. Возвращаем скорость и прыжок к стандарту
+       if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+           game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+           game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
+       end
+       
+       -- 3. Полностью уничтожаем интерфейс Rayfield
+       Rayfield:Destroy()
    end,
 })
