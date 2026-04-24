@@ -100,7 +100,7 @@ PlayerTab:CreateSlider({
 })
 
 PlayerTab:CreateToggle({
-   Name = "Anti-Ragdoll (Зависание при ударе)",
+   Name = "Anti-Ragdoll (Зависание 0.1с)",
    CurrentValue = false,
    Callback = function(Value)
       _G.AntiRagdoll = Value
@@ -113,17 +113,16 @@ PlayerTab:CreateToggle({
                       local root = char:FindFirstChild("HumanoidRootPart")
                       if hum and root then
                           local state = hum:GetState()
-                          -- Проверяем, не пытается ли игра нас уронить
                           if state == Enum.HumanoidStateType.Ragdoll or state == Enum.HumanoidStateType.FallingDown then
                               hum.PlatformStand = false
-                              root.Anchored = true -- Мертвая хватка в воздухе
-                              task.wait(0.1)       -- Время зависания (0.1 сек)
-                              root.Anchored = false -- Снова можно двигаться
+                              root.Anchored = true
+                              task.wait(0.1) -- Зависаем на 0.1 сек
+                              root.Anchored = false
                               hum:ChangeState(Enum.HumanoidStateType.GettingUp)
                           end
                       end
                   end
-                  task.wait(0.01) -- Скорость проверки (очень быстрая)
+                  task.wait(0.01)
               end
           end)
       end
