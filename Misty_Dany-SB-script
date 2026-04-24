@@ -104,26 +104,29 @@ PlayerTab:CreateToggle({
    CurrentValue = false,
    Callback = function(Value)
       _G.AntiRagdoll = Value
-      task.spawn(function()
-          while _G.AntiRagdoll do
-              local char = game.Players.LocalPlayer.Character
-              if char then
-                  local hum = char:FindFirstChildOfClass("Humanoid")
-                  local root = char:FindFirstChild("HumanoidRootPart")
-                  if hum and root then
-                      -- Если состояние сменилось на падение или регдолл
-                      if hum:GetState() == Enum.HumanoidStateType.Ragdoll or hum:GetState() == Enum.HumanoidStateType.FallingDown then
-                          hum.PlatformStand = false
-                          root.Anchored = true -- Замораживаем на месте
-                          task.wait(0.1)       -- Ждем 0.1 сек, чтобы погасить инерцию удара
-                          root.Anchored = false -- Размораживаем
-                          hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+      if Value then
+          task.spawn(function()
+              while _G.AntiRagdoll do
+                  local char = game.Players.LocalPlayer.Character
+                  if char then
+                      local hum = char:FindFirstChildOfClass("Humanoid")
+                      local root = char:FindFirstChild("HumanoidRootPart")
+                      if hum and root then
+                          local state = hum:GetState()
+                          -- Проверяем, не пытается ли игра нас уронить
+                          if state == Enum.HumanoidStateType.Ragdoll or state == Enum.HumanoidStateType.FallingDown then
+                              hum.PlatformStand = false
+                              root.Anchored = true -- Мертвая хватка в воздухе
+                              task.wait(0.1)       -- Время зависания (0.1 сек)
+                              root.Anchored = false -- Снова можно двигаться
+                              hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                          end
                       end
                   end
+                  task.wait(0.01) -- Скорость проверки (очень быстрая)
               end
-              task.wait()
-          end
-      end)
+          end)
+      end
    end,
 })
 
