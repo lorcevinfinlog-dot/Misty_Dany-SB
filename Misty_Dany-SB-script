@@ -100,21 +100,30 @@ PlayerTab:CreateSlider({
 })
 
 PlayerTab:CreateToggle({
-   Name = "	Анти регдол (Перерабатывается)",
+   Name = "Anti-Ragdoll (Зависание при ударе)",
    CurrentValue = false,
    Callback = function(Value)
-      antiRagdollEnabled = Value
-      if antiRagdollEnabled then
-          task.spawn(function()
-              while antiRagdollEnabled do
-                  local char = game.Players.LocalPlayer.Character
-                  if char and char:FindFirstChild("Humanoid") then
-                      char.Humanoid.PlatformStand = false
+      _G.AntiRagdoll = Value
+      task.spawn(function()
+          while _G.AntiRagdoll do
+              local char = game.Players.LocalPlayer.Character
+              if char then
+                  local hum = char:FindFirstChildOfClass("Humanoid")
+                  local root = char:FindFirstChild("HumanoidRootPart")
+                  if hum and root then
+                      -- Если состояние сменилось на падение или регдолл
+                      if hum:GetState() == Enum.HumanoidStateType.Ragdoll or hum:GetState() == Enum.HumanoidStateType.FallingDown then
+                          hum.PlatformStand = false
+                          root.Anchored = true -- Замораживаем на месте
+                          task.wait(0.1)       -- Ждем 0.1 сек, чтобы погасить инерцию удара
+                          root.Anchored = false -- Размораживаем
+                          hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                      end
                   end
-                  task.wait(0.1)
               end
-          end)
-      end
+              task.wait()
+          end
+      end)
    end,
 })
 
@@ -195,7 +204,7 @@ PlayerTab:CreateToggle({
 local MiscTab = Window:CreateTab("Safety", 4483362458)
 
 MiscTab:CreateButton({
-   Name = "Анти чит (Недоделан)",
+   Name = "Анти чит (BETA)",
    Callback = function()
        local mt = getrawmetatable(game)
        local old = mt.__index
@@ -212,7 +221,7 @@ MiscTab:CreateButton({
 })
 
 MiscTab:CreateToggle({
-   Name = "Anti-AFK",
+   Name = "Анти-АФК(Anti-AFK)",
    CurrentValue = true,
    Callback = function(Value)
       if Value then
