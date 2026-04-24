@@ -1,9 +1,9 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "Misty_Dany Hub | Slap Battles",
-   LoadingTitle = "Настройка высоты...",
-   LoadingSubtitle = "by Gemini AI",
+   Name = "Misty_Dany-Hub | Slap Battles",
+   LoadingTitle = "Загрузка настроек...",
+   LoadingSubtitle = "by Danil",
    ConfigurationSaving = {
       Enabled = true,
       FolderName = "MistyDanyConfig",
@@ -37,21 +37,21 @@ ScriptsTab:CreateButton({
 })
 
 ScriptsTab:CreateButton({
-   Name = "+tyk (Tycoon Clicker)",
+   Name = "Тайкун кликер (не актевировать)",
    Callback = function()
        loadstring(game:HttpGet("https://raw.githubusercontent.com/IncognitoScripts/SlapBattles/main/TycoonClicker", true))()
    end,
 })
 
 ScriptsTab:CreateButton({
-   Name = "Guide Boss Fight",
+   Name = "Босс Файт с Гидом",
    Callback = function()
        loadstring(game:HttpGet("https://pastefy.app/Ty7G6BXs/raw"))()
    end,
 })
 
 ScriptsTab:CreateButton({
-   Name = "Farm Killstrike",
+   Name = "Фарм Киллстрайка (недароботан)",
    Callback = function()
        loadstring(game:HttpGet("https://raw.githubusercontent.com/IncognitoScripts/SlapBattles/main/KillstreakFarm", true))()
    end,
@@ -65,7 +65,7 @@ ScriptsTab:CreateButton({
 })
 
 ScriptsTab:CreateButton({
-   Name = "Основное SBP",
+   Name = "SBP",
    Callback = function()
        loadstring(game:HttpGet("https://raw.githubusercontent.com/xxxrrxsds-art/losehubs/refs/heads/main/sbp.lua"))()
    end,
@@ -75,10 +75,10 @@ ScriptsTab:CreateButton({
 local PlayerTab = Window:CreateTab("Player & Fly", 4483362458)
 
 PlayerTab:CreateSlider({
-   Name = "Скорость (WalkSpeed)",
-   Range = {16, 300},
+   Name = "Скорость",
+   Range = {20, 300},
    Increment = 1,
-   CurrentValue = 16,
+   CurrentValue = 20,
    Callback = function(Value)
       if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
          game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
@@ -87,7 +87,7 @@ PlayerTab:CreateSlider({
 })
 
 PlayerTab:CreateSlider({
-   Name = "Сила прыжка (JumpPower)",
+   Name = "Сила прыжка",
    Range = {50, 300},
    Increment = 1,
    CurrentValue = 50,
@@ -100,7 +100,7 @@ PlayerTab:CreateSlider({
 })
 
 PlayerTab:CreateToggle({
-   Name = "Anti-Ragdoll",
+   Name = "	Анти регдол (Перерабатывается)",
    CurrentValue = false,
    Callback = function(Value)
       antiRagdollEnabled = Value
@@ -163,7 +163,7 @@ PlayerTab:CreateSlider({
 
 -- ПЛАТФОРМА НА -15 (Идеальная высота)
 PlayerTab:CreateToggle({
-   Name = "Анти-Войд (Платформа -15)",
+   Name = "Анти-Войд (Платформа -5)",
    CurrentValue = false,
    Callback = function(Value)
       platformEnabled = Value
@@ -178,8 +178,8 @@ PlayerTab:CreateToggle({
               while platformEnabled do
                   local char = game.Players.LocalPlayer.Character
                   if char and char:FindFirstChild("HumanoidRootPart") then
-                      -- Позиция Y зафиксирована на -15 относительно основной земли
-                      platform.Position = Vector3.new(char.HumanoidRootPart.Position.X, -15, char.HumanoidRootPart.Position.Z)
+                      -- Позиция Y зафиксирована на -5 относительно основной земли
+                      platform.Position = Vector3.new(char.HumanoidRootPart.Position.X, -5, char.HumanoidRootPart.Position.Z)
                   end
                   task.wait()
               end
@@ -195,7 +195,7 @@ PlayerTab:CreateToggle({
 local MiscTab = Window:CreateTab("Safety", 4483362458)
 
 MiscTab:CreateButton({
-   Name = "Anti-Cheat Bypass",
+   Name = "Анти чит (Недоделан)",
    Callback = function()
        local mt = getrawmetatable(game)
        local old = mt.__index
