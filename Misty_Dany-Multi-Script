@@ -201,7 +201,7 @@ local FlyToggle = PlayerTab:CreateToggle({
 
 PlayerTab:CreateKeybind({
    Name = "Кнопка для Fly",
-   CurrentKeybind = "f",
+   CurrentKeybind = "F",
    HoldToInteract = false,
    Callback = function()
        FlyToggle:Set(not flyEnabled)
@@ -286,7 +286,7 @@ local AntiAfkToggle = MiscTab:CreateToggle({
 
 MiscTab:CreateKeybind({
    Name = "Кнопка для Анти-АФК",
-   CurrentKeybind = "g",
+   CurrentKeybind = "G",
    HoldToInteract = false,
    Callback = function()
        AntiAfkToggle:Set(not antiAfkEnabled)
