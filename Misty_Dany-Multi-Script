@@ -112,8 +112,8 @@ local GodModeToggle = PlayerTab:CreateToggle({
             local char = player.Character
             if char and char:FindFirstChild("Humanoid") then
                -- Защита от ваншотов через HP
-               char.Humanoid.MaxHealth = 1000000
-               char.Humanoid.Health = 1000000
+               char.Humanoid.MaxHealth = 1000000000
+               char.Humanoid.Health = 1000000000
                
                -- Удаление эффектов Plague (Чумы) и других дебаффов
                for _, effect in pairs(char:GetChildren()) do
@@ -256,7 +256,7 @@ local PlatformToggle = PlayerTab:CreateToggle({
       platformEnabled = Value
       if platformEnabled then
           platform = Instance.new("Part", workspace)
-          platform.Size = Vector3.new(2000, 1, 2000)
+          platform.Size = Vector3.new(200000, 1, 200000)
           platform.Anchored = true
           platform.Transparency = 0.7
           platform.Material = Enum.Material.ForceField
