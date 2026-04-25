@@ -131,7 +131,7 @@ local GodModeToggle = PlayerTab:CreateToggle({
          end
       end)
    end,
-}),
+})
 
 local AntiRagdollToggle = PlayerTab:CreateToggle({
    Name = "Анти Регдол (BETA)",
