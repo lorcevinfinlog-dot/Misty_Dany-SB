@@ -101,6 +101,38 @@ PlayerTab:CreateSlider({
    end,
 })
 
+local GodModeToggle = PlayerTab:CreateToggle({
+   Name = "Бог режим (Anti-OneShot & Plague)",
+   CurrentValue = false,
+   Callback = function(Value)
+      _G.GodMode = Value
+      task.spawn(function()
+         while _G.GodMode do
+            local player = game.Players.LocalPlayer
+            local char = player.Character
+            if char and char:FindFirstChild("Humanoid") then
+               -- Защита от ваншотов через HP
+               char.Humanoid.MaxHealth = 1000000
+               char.Humanoid.Health = 1000000
+               
+               -- Удаление эффектов Plague (Чумы) и других дебаффов
+               for _, effect in pairs(char:GetChildren()) do
+                  if effect.Name == "Plague" or effect.Name == "Infected" or effect:IsA("ForceField") then
+                     effect:Destroy()
+                  end
+               end
+            end
+            task.wait(0.1)
+         end
+         -- Сброс до стандарта при выключении
+         if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+            game.Players.LocalPlayer.Character.Humanoid.MaxHealth = 100
+            game.Players.LocalPlayer.Character.Humanoid.Health = 100
+         end
+      end)
+   end,
+}),
+
 local AntiRagdollToggle = PlayerTab:CreateToggle({
    Name = "Анти Регдол (BETA)",
    CurrentValue = false,
@@ -301,10 +333,11 @@ MiscTab:CreateButton({
        if PlatformToggle then PlatformToggle:Set(false) end
        if AntiRagdollToggle then AntiRagdollToggle:Set(false) end
        if AntiAfkToggle then AntiAfkToggle:Set(false) end
+	   if GodModeToggle then GodModeToggle:Set(false) end
        
        -- 2. Возвращаем скорость и прыжок к стандарту
        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-           game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+           game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 20
            game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
        end
        
