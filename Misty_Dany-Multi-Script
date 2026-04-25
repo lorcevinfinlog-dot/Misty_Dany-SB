@@ -101,35 +101,49 @@ PlayerTab:CreateSlider({
    end,
 })
 
+-- Сам переключатель (Toggle)
 local GodModeToggle = PlayerTab:CreateToggle({
    Name = "Бог режим (Anti-OneShot & Plague)",
    CurrentValue = false,
    Callback = function(Value)
       _G.GodMode = Value
-      task.spawn(function()
-         while _G.GodMode do
-            local player = game.Players.LocalPlayer
-            local char = player.Character
-            if char and char:FindFirstChild("Humanoid") then
-               -- Защита от ваншотов через HP
-               char.Humanoid.MaxHealth = 1000000000
-               char.Humanoid.Health = 1000000000
-               
-               -- Удаление эффектов Plague (Чумы) и других дебаффов
-               for _, effect in pairs(char:GetChildren()) do
-                  if effect.Name == "Plague" or effect.Name == "Infected" or effect:IsA("ForceField") then
-                     effect:Destroy()
-                  end
-               end
-            end
-            task.wait(0.1)
-         end
-         -- Сброс до стандарта при выключении
-         if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-            game.Players.LocalPlayer.Character.Humanoid.MaxHealth = 100
-            game.Players.LocalPlayer.Character.Humanoid.Health = 100
-         end
-      end)
+      if _G.GodMode then
+          task.spawn(function()
+             while _G.GodMode do
+                local player = game.Players.LocalPlayer
+                local char = player.Character
+                if char and char:FindFirstChild("Humanoid") then
+                   -- Защита от ваншотов через HP
+                   char.Humanoid.MaxHealth = 1000000000
+                   char.Humanoid.Health = 1000000000
+                   
+                   -- Удаление эффектов Plague (Чумы) и других дебаффов
+                   for _, effect in pairs(char:GetChildren()) do
+                      if effect.Name == "Plague" or effect.Name == "Infected" or effect:IsA("ForceField") then
+                         effect:Destroy()
+                      end
+                   end
+                end
+                task.wait(0.1)
+             end
+             -- Сброс до стандарта при выключении
+             if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+                game.Players.LocalPlayer.Character.Humanoid.MaxHealth = 100
+                game.Players.LocalPlayer.Character.Humanoid.Health = 100
+             end
+          end)
+      end
+   end,
+})
+
+-- Кейбинд для Бог режима
+PlayerTab:CreateKeybind({
+   Name = "Кейбинд Бог режима",
+   CurrentKeybind = "G", -- Можешь заменить на любую клавишу
+   HoldToInteract = false,
+   Callback = function()
+       -- Переключает состояние Toggle
+       GodModeToggle:Set(not _G.GodMode)
    end,
 })
 
@@ -318,7 +332,7 @@ local AntiAfkToggle = MiscTab:CreateToggle({
 
 MiscTab:CreateKeybind({
    Name = "Кнопка для Анти-АФК",
-   CurrentKeybind = "G",
+   CurrentKeybind = "H",
    HoldToInteract = false,
    Callback = function()
        AntiAfkToggle:Set(not antiAfkEnabled)
